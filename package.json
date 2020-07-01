@@ -16,6 +16,22 @@
     "lint": "eslint './src/**/*.{js,ts}' --quiet --fix",
     "test": "cross-env NODE_ENV=test karma start test/karma.conf.js"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./src/**/*.{js,ts}": [
+      "tsc --noEmit",
+      "eslint --fix",
+      "git add"
+    ],
+    "./test/unit/**/*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -35,6 +51,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "html-webpack-plugin": "^4.3.0",
+    "husky": "^4.2.5",
     "karma": "^5.1.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
@@ -43,6 +60,7 @@
     "karma-mocha": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^4.0.2",
+    "lint-staged": "^10.2.11",
     "mocha": "^8.0.1",
     "prettier": "^2.0.5",
     "ts-loader": "^7.0.5",
