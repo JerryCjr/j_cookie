@@ -1,12 +1,4 @@
-import { convert, escapeRe } from './utils';
-
-interface options {
-  expires?: Date;
-  path?: string;
-  domain?: string;
-  secure?: boolean;
-  [propName: string]: any;
-}
+import { convert, escapeRe, options } from './utils';
 
 const isEnabled = (): boolean => {
   const key = '@key@';
@@ -24,12 +16,16 @@ const isEnabled = (): boolean => {
   return enabled;
 };
 
-const get = (key: string): string => {
+const get = (key: string): string | null => {
+  if (!key) {
+    return null;
+  }
+
   const reKey = new RegExp(`(?:^|; )${escapeRe(key)}(?:=([^;]*))?(?:;|$)`);
   const match = reKey.exec(document.cookie);
 
   if (match === null) {
-    return '';
+    return null;
   }
 
   return match[1];

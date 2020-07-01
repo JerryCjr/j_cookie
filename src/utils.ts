@@ -43,4 +43,4 @@ function escapeRe(str: string): string {
   return str.replace(/[.*+?^$|[\](){}\\-]/g, '\\$&');
 }
 
-export { convert, escapeRe };
+export { options, convert, escapeRe };

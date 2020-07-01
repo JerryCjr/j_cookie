@@ -1,57 +1,94 @@
-// import { main, testAsyncFunc } from '../../src/index.ts';
-import { convert } from '../../src/utils';
+import { isEnabled, get, set, remove } from '../../src/index';
 
-describe('util_cover_test', () => {
-  it("convert should return '' when the arguments[0] is undefined", () => {
-    const options = undefined;
-    expect(convert(options)).to.be.equal('');
-  });
-  it("convert should return ';path=/' when the arguments[0] is null", () => {
-    const options = null;
-    expect(convert(options)).to.be.equal('');
-  });
-  it("convert should return ';path=/' when the arguments[0] is {}", () => {
-    const options = {};
-    expect(convert(options)).to.be.equal(';path=/');
-  });
-  it('convert should return expected value', () => {
-    const expires = new Date(-1);
-    const path = '/';
-    const domain = '.babyfs.cn';
-    const secure = false;
-
-    const options = {
-      expires,
-      path,
-      domain,
-      secure,
-    };
-    expect(convert(options)).to.be.equal(`;expires=${expires.toUTCString()};path=${path};domain=${domain}`);
+describe('isEnabled()', () => {
+  it('should return true if the cookie is enabled', () => {
+    expect(isEnabled()).to.be.equal(true);
   });
 });
 
-describe('index_test', function () {
-  before(function () {
-    // 在本区块的所有测试用例之前执行
+describe('get()', () => {
+  // return null cases
+  it('should return null if empty string passed', () => {
+    document.cookie = 'onlyvalue';
+    expect(get('')).to.be.equal(null);
+    document.cookie = '=tiny=cookie';
+    expect(get('')).to.be.equal(null);
   });
 
-  after(function () {
-    // 在本区块的所有测试用例之后执行
+  it("should return null if the cookie key isn't exist", () => {
+    expect(get('nokey')).to.be.equal(null);
   });
 
-  beforeEach(function () {
-    // 在本区块的每个测试用例之前执行
+  // whitespace
+  it('should return right value if cookie key contains whitespace', () => {
+    const key = 'he   lllo';
+    const value = 'world';
+    document.cookie = key + '=' + value;
+    expect(get(key)).to.be.equal(value);
   });
 
-  afterEach(function () {
-    // 在本区块的每个测试用例之后执行
+  it('should return right value if cookie value contains whitespace', () => {
+    const key = 'whitespacevalue';
+    const value = 'va    lue';
+    document.cookie = key + '=' + value;
+    expect(get(key)).to.be.equal(value);
   });
 
-  it('should_be_return_correctly', async () => {
-    let text = await main();
-    let test = await testAsyncFunc();
-    // let text = main();
-    expect(text).to.be.equal('Hello world!');
-    expect(test).to.be.equal(1);
+  // normal cases
+  it("should return 'tom' if 'name' passed", () => {
+    document.cookie = 'name=tom';
+    document.cookie = 'namename=tomtom';
+    expect(get('name')).to.be.equal('tom');
+  });
+
+  it('should return an empty string if only key is set', () => {
+    document.cookie = 'onlykey=';
+    expect(get('onlykey')).to.be.equal('');
+  });
+});
+
+describe('set()', () => {
+  it('should return the set cookie value', () => {
+    set('someKey', 'someValue');
+    expect(get('someKey')).to.be.equal('someValue');
+  });
+
+  it('should return the set cookie value', () => {
+    set('someKey', 'true');
+    expect(get('someKey')).to.be.equal('true');
+  });
+
+  it('should return null when cookie path is restricted', () => {
+    set('path_cookie', 'some_value', { path: '/the-other-path/' });
+    expect(get('path_cookie')).to.equal(null);
+  });
+});
+
+describe('remove()', () => {
+  it("should return null when remove 'removeKey' cookie ", () => {
+    set('removeKey', 'removeValue', {
+      path: '/',
+      domain: '',
+    });
+    remove('removeKey');
+    expect(get('removeKey')).to.be.equal(null);
+  });
+  it("should return null when remove 'removeKeyUnderPath' cookie under the specified path ", () => {
+    set('removeKeyUnderPath', 'removeValueUnderPath', {
+      path: '/underPath',
+    });
+    remove('removeKeyUnderPath', {
+      path: '/underPath',
+    });
+    expect(get('removeKeyUnderPath')).to.be.equal(null);
+  });
+  it("should return null when remove 'removeKeyUnderDomain' cookie under the specified domain ", () => {
+    set('removeKeyUnderDomain', 'removeValueUnderDomain', {
+      domain: 'localhost',
+    });
+    remove('removeKeyUnderDomain', {
+      domain: 'localhost',
+    });
+    expect(get('removeKeyUnderDomain')).to.be.equal(null);
   });
 });
