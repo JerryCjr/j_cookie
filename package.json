@@ -24,12 +24,10 @@
   "lint-staged": {
     "./src/**/*.{js,ts}": [
       "tsc --noEmit",
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ],
     "./test/unit/**/*.js": [
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ]
   },
   "keywords": [],
